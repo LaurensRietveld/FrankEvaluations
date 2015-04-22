@@ -18,7 +18,6 @@ while read -r downloadLink; do
         (( skipped++ ));
         continue;
     fi
-    exit;
     resultForDoc=$resultsDir/`basename $downloadLink` && mkdir -p $resultForDoc;
     echo "Processing $downloadLink ($count)";
     #download zip file, measure zipped file size, uncompress, and measure uncompressed file size
