@@ -1,9 +1,10 @@
 #!/bin/bash
 
 #clone sub repos
-( cd hdt && git clone git@github.com:LaurensRietveld/hdt-cpp.git . )
-( cd frank && git clone git@github.com:LODLaundry/Frank.git . )
+if [ ! "$(ls -A hdt)" ]; then ( cd hdt && git clone git@github.com:LaurensRietveld/hdt-cpp.git . ); fi
+if [ ! "$(ls -A frank)" ]; then ( cd frank && git clone git@github.com:LODLaundry/Frank.git  . ); fi
 
+#compile c
 ( cd hdt/hdt-lib && make );
 
 
