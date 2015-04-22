@@ -1,17 +1,19 @@
 #!/bin/bash
 
-frank=frank/frank
+
 rdf2hdt=hdt/hdt-lib/tools/rdf2hdt
 hdtLoad=hdt/hdt-lib/examples/load
 resultsDir=results
 tmpDir=tmp;
 
-#clean previous results
-rm -rf $resultsDir/*
+
 skipped=0;
 count=1;
 #get all documents from frank
 
+if [ -n "$1" ]; then
+    resultsDir="$1"
+fi
 
 if [ -t 0 ]; then
   #nothing is piped. print help message
@@ -19,6 +21,9 @@ if [ -t 0 ]; then
   echo "    ./frank/frank documents -d --minTriples 100 --maxTriples 1000 | ./runExperiment.sh"
   exit;
 fi
+#clean previous results
+rm -rf $resultsDir/*
+mkdir -p $resultsDir;
 while read -r downloadLink; do
     rm -rf $tmpDir/*
     if curl -I -s -X HEAD $downloadLink | grep --quiet .nq.gz ; then
