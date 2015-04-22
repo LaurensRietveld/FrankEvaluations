@@ -7,8 +7,7 @@ resultsDir=results
 tmpDir=tmp;
 
 #clean previous results
-
-rm -r $resultsDir/*
+rm -rf $resultsDir/*
 skipped=0;
 count=1;
 #get all documents from frank
