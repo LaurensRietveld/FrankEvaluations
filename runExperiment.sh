@@ -11,6 +11,14 @@ rm -rf $resultsDir/*
 skipped=0;
 count=1;
 #get all documents from frank
+
+
+if [ -t 0 ]; then
+  #nothing is piped. print help message
+  echo "To use this script, pipe a stream of download locations to it. e.g.:"
+  echo "    ./frank/frank documents -d --minTriples 100 --maxTriples 1000 | ./runExperiment.sh"
+  exit;
+fi
 while read -r downloadLink; do
     rm -rf $tmpDir/*
     if curl -I -s -X HEAD $downloadLink | grep --quiet .nq.gz ; then
