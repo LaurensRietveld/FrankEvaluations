@@ -11,14 +11,14 @@ rm -rf $resultsDir/*
 skipped=0;
 count=1;
 #get all documents from frank
-$frank documents -d "$@" | while read -r downloadLink; do
+while read -r downloadLink; do
     rm -r $tmpDir/*
-    if [ `curl -I -s $downloadLink | grep .nq.gz` ]; then
+    if curl -I -s -X HEAD $downloadLink | grep --quiet .nq.gz ; then
         echo "skipping quad file $downloadLink ($skipped)";
         (( skipped++ ));
         continue;
     fi
-    
+    exit;
     resultForDoc=$resultsDir/`basename $downloadLink` && mkdir -p $resultForDoc;
     echo "Processing $downloadLink ($count)";
     #download zip file, measure zipped file size, uncompress, and measure uncompressed file size
