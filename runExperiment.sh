@@ -12,7 +12,7 @@ skipped=0;
 count=1;
 #get all documents from frank
 $frank documents -d "$@" | while read -r downloadLink; do
-    rm -r $tmpDir/*
+    rm -rf $tmpDir/*
     if [ `curl -I -s $downloadLink | grep .nq.gz` ]; then
         echo "skipping quad file $downloadLink ($skipped)";
         (( skipped++ ));
