@@ -10,17 +10,18 @@ tmpDir=tmp;
 
 rm -r $resultsDir/*
 skipped=0;
+count=1;
 #get all documents from frank
-$frank documents -d | while read -r downloadLink; do
+$frank documents -d "$@" | while read -r downloadLink; do
     rm -r $tmpDir/*
     if [ `curl -I -s $downloadLink | grep .nq.gz` ]; then
         echo "skipping quad file $downloadLink ($skipped)";
-        $((skipped++));
+        (( skipped++ ));
         continue;
     fi
     
     resultForDoc=$resultsDir/`basename $downloadLink` && mkdir -p $resultForDoc;
-    echo "Processing $downloadLink";
+    echo "Processing $downloadLink ($count)";
     #download zip file, measure zipped file size, uncompress, and measure uncompressed file size
     echo " - Downloading and uncompressing";
     curl -s $downloadLink \
@@ -28,14 +29,17 @@ $frank documents -d | while read -r downloadLink; do
         | zcat \
         | tee >(wc -c > $resultForDoc/uncompressedFileSize) >(wc -l > $resultForDoc/numTriples) > $tmpDir/unpacked;
         
-        #build hdt file from uncompressed file. Measure hdt file size, and build time
-        echo " - Building HDT file";
-        $rdf2hdt $tmpDir/unpacked $tmpDir/hdt.hdt > $resultForDoc/hdtBuildTime;
-        wc -c $tmpDir/hdt.hdt > $resultForDoc/hdtFileSize;
-        
-        #testing load time
-        echo " - Testing load time"
-        $hdtLoad $tmpDir/hdt.hdt > $resultForDoc/hdtLoadTime;
+    #build hdt file from uncompressed file. Measure hdt file size, and build time
+    echo " - Building HDT file";
+    $rdf2hdt $tmpDir/unpacked $tmpDir/hdt.hdt > $resultForDoc/hdtBuildTime;
+    wc -c $tmpDir/hdt.hdt > $resultForDoc/hdtFileSize;
+    
+    #testing load time
+    echo " - Testing load time"
+    $hdtLoad $tmpDir/hdt.hdt > $resultForDoc/hdtLoadTime;
+    (( count++ ));
+    
+    
 done;
 
 
