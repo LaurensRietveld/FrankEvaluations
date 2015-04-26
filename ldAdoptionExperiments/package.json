@@ -9,6 +9,9 @@
   "author": "Laurens Rietveld",
   "license": "MIT",
   "dependencies": {
-    "n3": "^0.4.2"
+    "n3": "^0.4.2",
+    "byline": "^4.2.1",
+    "request": "^2.55.0",
+    "superagent": "^1.2.0"
   }
 }

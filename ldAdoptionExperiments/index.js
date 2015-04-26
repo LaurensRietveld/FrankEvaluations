@@ -1,24 +1,12 @@
 var N3 = require('n3'),
     fs = require('fs'),
-    parser = N3.Parser();
+    byline = require('byline'),
+    request = require('superagent'),
+    zlib = require('zlib');
 if (process.stdin.isTTY) {
     console.error("This node script only works with a stream (via bash pipe) of n-quads");
     process.exit(1);
 }
-//var self = process.stdin;
-//self.on('readable', function() {
-//    var chunk = this.read();
-//    console.log(chunk);
-//});
-//
-//var parser = N3.Parser(),
-//rdfStream = fs.createReadStream('cartoons.ttl');
-//
-//{ subject: 'http:/scratch/lodlaundromat/crawls/12/69e7c7ccdc8f0b373325d5acf3c27b26/dirty',
-//    predicate: '%5C%22dc:issued%5C%22',
-//    object: '"2010"',
-//    graph: 'http://lodlaundromat.org/resource/69e7c7ccdc8f0b373325d5acf3c27b26' }
-
 
 
 var prefixCcList = require('./prefixcc.js');
@@ -68,28 +56,46 @@ var writeCounters = function() {
     wstream.end();
 }
 var subPrefix, predPrefix, objPrefix;
-parser.parse(process.stdin, function(error, triple, prefixes) {
-    if (error) return;//should not happend anyway, considering the formatting of lod laundromat
-    //we know the triples are sorted by graph
-//    console.log(error, triple, prefixes);
-    if (triple.graph !== prevDoc) {
-        prevDoc = triple.graph;
+
+
+
+var subPrefix, predPrefix, objPrefix;
+var numDocsDone = 0;
+var triplesCount = 0;
+function handleDoc() {
+    
+    var writer = new require('stream').Writable({ objectMode: true });
+    writer._write = function (doc, encoding, done) {
         numDocsDone++;
-    }
+        var lineStream = byline.createStream();
+        var zlibStream = zlib.createGunzip({ encoding: 'utf8' });
+        var parser = new  N3.StreamParser();
+        var req = request.get(doc)
+            .pipe(zlibStream)
+            .pipe(lineStream)
+            .pipe(parser);
     
-//    console.log(triple);
-    if (subPrefix = getPrefix(triple.subject)) counters[subPrefix]++;
-//    console.log("pred");
-    if (predPrefix = getPrefix(triple.predicate)) counters[predPrefix]++;
-//    console.log("obj");
-    if (triple.object.charAt(0) !== '"' && (subPrefix = getPrefix(triple.subject))) counters[subPrefix]++;
-    
-//    writeCounters();
-    
-    if (numDocsDone % 1000 === 0) {
-        process.stdout.write("Processed " + numDocsDone + "\n");
-        writeCounters();
-    } else {
-        process.stdout.write("Processed " + numDocsDone + "\r");
-    }
-});
+        parser.on('data', function(triple) {
+            triplesCount++;
+            if (subPrefix = getPrefix(triple.subject)) counters[subPrefix]++;
+            if (predPrefix = getPrefix(triple.predicate)) counters[predPrefix]++;
+            if (triple.object.charAt(0) !== '"' && (subPrefix = getPrefix(triple.subject))) counters[subPrefix]++;
+        });
+        parser.on('end', function() {
+            var msg = "Processed " + numDocsDone + " documents (" + triplesCount + " triples)";
+            if (numDocsDone % 1000 === 0) {
+                process.stdout.write(msg + "\n");
+                writeCounters();
+            } else {
+                process.stdout.write(msg + "\r");
+            }
+            done();
+        });
+        
+      };
+      return writer;
+}
+
+
+var stream = byline.createStream(process.stdin, { encoding: 'utf8' });
+stream.pipe(new handleDoc());
