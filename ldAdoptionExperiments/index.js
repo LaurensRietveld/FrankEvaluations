@@ -63,7 +63,7 @@ var subPrefix, predPrefix, objPrefix;
 var numDocsDone = 0;
 var triplesCount = 0;
 function handleDoc() {
-    
+    var docNamespaces = {};
     var writer = new require('stream').Writable({ objectMode: true });
     writer._write = function (doc, encoding, done) {
         numDocsDone++;
@@ -74,14 +74,19 @@ function handleDoc() {
             .pipe(zlibStream)
             .pipe(lineStream)
             .pipe(parser);
-    
+        
         parser.on('data', function(triple) {
             triplesCount++;
-            if (subPrefix = getPrefix(triple.subject)) counters[subPrefix]++;
-            if (predPrefix = getPrefix(triple.predicate)) counters[predPrefix]++;
-            if (triple.object.charAt(0) !== '"' && (subPrefix = getPrefix(triple.subject))) counters[subPrefix]++;
+            if (subPrefix = getPrefix(triple.subject)) docNamespaces(subPrefix) = true;
+            if (predPrefix = getPrefix(triple.predicate)) docNamespaces(predPrefix) = true;
+            if (triple.object.charAt(0) !== '"' && (objPrefix = getPrefix(triple.object))) docNamespaces(objPrefix) = true;
         });
         parser.on('end', function() {
+            //up counters
+            for (var ns in docNamespaces) {
+                counters[ns]++;
+            }
+            
             var msg = "Processed " + numDocsDone + " documents (" + triplesCount + " triples)";
             if (numDocsDone % 1000 === 0) {
                 process.stdout.write(msg + "\n");
