@@ -1,0 +1,14 @@
+{
+  "name": "ldAdoptionExperiments",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Laurens Rietveld",
+  "license": "MIT",
+  "dependencies": {
+    "n3": "^0.4.2"
+  }
+}
