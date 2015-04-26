@@ -79,10 +79,10 @@ var doDir = function() {
             var fromFile = line.split('\t')[0];
             //append # or /, as we removed this in clod
             if (ns = getPrefix(fromFile + '#')) {
-                console.log(ns);
+//                console.log(ns);
                 docNamespaces[ns] = true;
             } else if (ns = getPrefix(fromFile + '/')){
-                console.log(ns);
+//                console.log(ns);
                 docNamespaces[ns] = true;
             }
         });
@@ -93,7 +93,7 @@ var doDir = function() {
                 counters[ns]++;
             }
 
-            var msg = "Processed " + numDocsDone + " documents (" + triplesCounts + " triples)";
+            var msg = "Processed " + numDocsDone + " documents (" + triplesCounts + " shortnames)";
             if (numDocsDone % 100 === 0) {
                 process.stdout.write(msg + "\n");
                 writeCounters();
