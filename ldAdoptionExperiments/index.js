@@ -55,7 +55,6 @@ var writeCounters = function() {
     }
     wstream.end();
 }
-var subPrefix, predPrefix, objPrefix;
 
 
 
@@ -77,12 +76,12 @@ function handleDoc() {
         
         parser.on('data', function(triple) {
             triplesCount++;
-            if (subPrefix = getPrefix(triple.subject)) docNamespaces(subPrefix) = true;
-            if (predPrefix = getPrefix(triple.predicate)) docNamespaces(predPrefix) = true;
-            if (triple.object.charAt(0) !== '"' && (objPrefix = getPrefix(triple.object))) docNamespaces(objPrefix) = true;
+            if (subPrefix = getPrefix(triple.subject)) docNamespaces[subPrefix] = true;
+            if (predPrefix = getPrefix(triple.predicate)) docNamespaces[predPrefix] = true;
+            if (triple.object.charAt(0) !== '"' && (objPrefix = getPrefix(triple.object))) docNamespaces[objPrefix] = true;
         });
 	parser.on('error', function() {
-		console.log(arguments);
+//		console.log(arguments);
 	});
         parser.on('end', function() {
             //up counters
