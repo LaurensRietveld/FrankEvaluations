@@ -49,7 +49,7 @@ prefixCcList.forEach(function(ns){
 
 var writeCounters = function() {
     console.log('writing to file');
-    var wstream = fs.createWriteStream(__dirname + '/results.tsv');
+    var wstream = fs.createWriteStream(__dirname + '/resultsQuick.tsv');
     for (var ns in counters) {
         wstream.write(ns + '\t' + counters[ns] + '\n');
     }
