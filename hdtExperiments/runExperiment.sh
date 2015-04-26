@@ -1,11 +1,13 @@
 #!/bin/bash
 
+currentDir=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+rdf2hdt=$currentDir/../hdt/hdt-lib/tools/rdf2hdt
+hdtLoad=$currentDir/../hdt/hdt-lib/examples/load
+resultsDir=$currentDir/results
+tmpDir=$currentDir/tmp;
 
-rdf2hdt=hdt/hdt-lib/tools/rdf2hdt
-hdtLoad=hdt/hdt-lib/examples/load
-resultsDir=results
-tmpDir=tmp;
-
+rm -rf $tmpDir;
+mkdir $tmpDir;
 
 skipped=0;
 count=1;
@@ -43,7 +45,7 @@ while read -r downloadLink; do
     #build hdt file from uncompressed file. Measure hdt file size, and build time
     echo " - Building HDT file";
     $rdf2hdt $tmpDir/unpacked $tmpDir/hdt.hdt > $resultForDoc/hdtBuildTime;
-    wc -c $tmpDir/hdt.hdt > $resultForDoc/hdtFileSize;
+    wc -c < $tmpDir/hdt.hdt > $resultForDoc/hdtFileSize;
     
     #testing load time
     echo " - Testing load time"
