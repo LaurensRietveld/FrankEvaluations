@@ -5,7 +5,7 @@ var docDirs = fs.readdirSync(process.env['METRIC_DIR']);
 
 
 
-var prefixCcList = require('./prefixcc.js');
+var prefixCcList = require('./lov.js');
 var getPrefix = function(find, startIndex, lastIndex) {
     if (startIndex === undefined)
         startIndex = 0;
