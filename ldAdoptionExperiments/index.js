@@ -49,7 +49,7 @@ prefixCcList.forEach(function(ns){
 
 var writeCounters = function() {
     console.log('writing to file');
-    var wstream = fs.createWriteStream(__dirname + '/resultsQuick.tsv');
+    var wstream = fs.createWriteStream(__dirname + '/results.tsv');
     for (var ns in counters) {
         wstream.write(ns + '\t' + counters[ns] + '\n');
     }
@@ -76,6 +76,7 @@ function handleDoc() {
         
         parser.on('data', function(triple) {
             triplesCount++;
+            if (triplesCount % 1000 == 0) process.stdout.write("Processed " + numDocsDone + " documents (" + triplesCount + " triples)\r") ;
             if (subPrefix = getPrefix(triple.subject)) docNamespaces[subPrefix] = true;
             if (predPrefix = getPrefix(triple.predicate)) docNamespaces[predPrefix] = true;
             if (triple.object.charAt(0) !== '"' && (objPrefix = getPrefix(triple.object))) docNamespaces[objPrefix] = true;
@@ -88,7 +89,6 @@ function handleDoc() {
             for (var ns in docNamespaces) {
                 counters[ns]++;
             }
-            
             var msg = "Processed " + numDocsDone + " documents (" + triplesCount + " triples)";
             if (numDocsDone % 50 === 0) {
                 process.stdout.write(msg + "\n");
